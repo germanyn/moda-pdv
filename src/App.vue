@@ -1,29 +1,48 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+  <v-app>
+    <v-content>
+      <router-view/>
+    </v-content>
+  </v-app>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
+import Vue from 'vue';
+import html2canvas from 'html2canvas';
 
-@Component({
+export default Vue.extend({
+  name: 'App',
+
   components: {
-    HelloWorld,
   },
-})
-export default class App extends Vue {}
-</script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+  data: () => ({
+    selector: '',
+  }),
+
+  mounted() {
+    // @ts-ignore
+    window.downloadPNG = this.download
+  },
+  
+  methods: {
+    async download(selector: string) {
+      const element: HTMLElement | null = document.querySelector(selector)
+      if (!element) return window.alert('elemento não encontrado')
+
+      const result = await html2canvas(element, {
+        width: element.clientWidth,
+        height: element.clientHeight,
+      })
+      const image = result.toDataURL("image/png")
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = 'Download.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+
+});
+</script>
